@@ -44,6 +44,11 @@ public class UserService implements CommunityConstant {
         return userMapper.selectById(id);
     }
 
+    /**
+     * 注册
+     * @param user
+     * @return
+     */
     public Map<String, Object> register(User user) {
         Map<String, Object> map = new HashMap<>();
 
@@ -81,12 +86,12 @@ public class UserService implements CommunityConstant {
 
         //注册用户
         user.setSalt(CommunityUtils.generateUUID().substring(0, 5));
-        user.setPassword(CommunityUtils.md5(user.getPassword()) + user.getSalt());
+        user.setPassword(CommunityUtils.md5(user.getPassword() + user.getSalt()));
 
         user.setType(0);
         user.setStatus(0);
         user.setActivationCode(CommunityUtils.generateUUID());
-        user.setHeaderUrl(String.format("http://images.nowcoder.com/lead/%dt.png", new Random().nextInt(1000)));
+        user.setHeaderUrl(String.format("http://images.nowcoder.com/head/%dt.png", new Random().nextInt(1000)));
         user.setCreateTime(new Date());
         userMapper.insertUser(user);
 
@@ -102,6 +107,12 @@ public class UserService implements CommunityConstant {
         return map;
     }
 
+    /**
+     * 激活
+     * @param userId
+     * @param code
+     * @return
+     */
     public int activation(int userId, String code) {
         User user = userMapper.selectById(userId);
         if (user.getStatus() == 1) {
@@ -113,6 +124,13 @@ public class UserService implements CommunityConstant {
         return ACTIVATION_FAILURE;
     }
 
+    /**
+     * 登录
+     * @param username
+     * @param password
+     * @param expiredSeconds
+     * @return
+     */
     public Map<String, Object> login(String username, String password, int expiredSeconds) {
         Map<String, Object> map = new HashMap<>();
 
@@ -152,6 +170,43 @@ public class UserService implements CommunityConstant {
         map.put("ticket", loginTicket.getTicket());
 
         return map;
+    }
+
+    /**
+     * 登出
+     * @param ticket
+     */
+    public void logout(String ticket) {
+        loginTicketMapper.updateStatus(ticket, 1);
+    }
+
+    /**
+     * 查询登录凭证
+     * @param ticket
+     * @return
+     */
+    public LoginTicket findLoginTicket(String ticket) {
+        return loginTicketMapper.selectByTicket(ticket);
+    }
+
+    /**
+     * 更改头像
+     * @param userId
+     * @param headerUrl
+     * @return
+     */
+    public int updateHeader(int userId, String headerUrl) {
+        return userMapper.updateHeader(userId, headerUrl);
+    }
+
+    /**
+     * 更改密码
+     * @param userId
+     * @param password
+     * @return
+     */
+    public int updatePassword(int userId, String password) {
+        return userMapper.updatePassword(userId, password);
     }
 }
 
