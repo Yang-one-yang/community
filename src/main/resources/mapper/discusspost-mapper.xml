@@ -16,8 +16,8 @@
         from discuss_post
         where status != 2
         <if test="userId!=0">
-            and user_id = #{userId}
-        </if>
+        and user_id = #{userId}
+    </if>
         order by type desc, create_time desc
         limit #{offset}, #{limit}
     </select>
@@ -41,4 +41,9 @@
         from discuss_post
         where id = #{id}
     </select>
+    
+    <update id="updateCommentCount">
+        update discuss_post set comment_count = #{commentCount}
+        where id = #{id}
+    </update>
 </mapper>
